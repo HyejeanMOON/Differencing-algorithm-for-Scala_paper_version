@@ -8,9 +8,6 @@ import probe.{CallEdge, CallGraph}
 
 import scala.reflect.io.AbstractFile
 
-
-
-
 trait AST_Traverse extends TreeTraversal with Collector with NodeMethod with HammockMethod with CallGraphCollections
   with ASTTokenFile with Extractor with HammockToFile with StatisticForCFG with CallRelation {
 
@@ -27,17 +24,12 @@ trait AST_Traverse extends TreeTraversal with Collector with NodeMethod with Ham
   var ASlevel = 0
   var ASNode = ""
 
-
   def BuildCFG: Unit = {
-
 
     //trees.foreach(ast_traverse(_))   // MOON
 
-
     for (t <- trees) {
-
       ast = ast + showRaw(t)
-
     }
     //--------------------------------
 /*
@@ -52,10 +44,6 @@ trait AST_Traverse extends TreeTraversal with Collector with NodeMethod with Ham
       val isSourceApp = isApplication(source)
       val isTargetApp = isApplication(target)
 
-
-
-
-
     }
 */
     /*
@@ -64,9 +52,6 @@ trait AST_Traverse extends TreeTraversal with Collector with NodeMethod with Ham
       println("CS " + cc._1 + " -> " + cc._2)
 
     }
-
-
-
 
 */
 
@@ -88,7 +73,6 @@ trait AST_Traverse extends TreeTraversal with Collector with NodeMethod with Ham
 
     StatisticToFile(HammockCount, NodeCount)
 
-
   }
 
   /**
@@ -101,13 +85,10 @@ trait AST_Traverse extends TreeTraversal with Collector with NodeMethod with Ham
   /**
     * Get the relative path for an absolute source file path.
     */
+    
   private def relativize(absolute: String) = {
     absolute.replaceFirst(".+/build_src/[^/]+/", "")
   }
-
-
-
-
 
   def ast_traverse(tree: Tree): Unit = {
 
@@ -115,23 +96,19 @@ trait AST_Traverse extends TreeTraversal with Collector with NodeMethod with Ham
 
         case p@PackageDef(pids, stats) =>
           //不为包设置Node
-
           stats.foreach(ast_traverse(_))
 
-
         case c@ClassDef(mods, name, tparams, impl) if !name.toString.contains("anonfun")  =>
-
           level += 1
           COTCount += 1
-
           if (mods.toString().contains("module")) {
-
+            
             entryNode = c.symbol.pkg + "." + name.toString + ".ObjectEntry"
             exitNode = c.symbol.pkg + "." + name.toString + ".ObjectExit"
-
+            
           }
           else if (mods.isTrait) {
-
+            
             entryNode = c.symbol.pkg + "." + name.toString + ".TraitEntry"
             exitNode = c.symbol.pkg + "." + name.toString + ".TraitExit"
 
@@ -157,9 +134,7 @@ trait AST_Traverse extends TreeTraversal with Collector with NodeMethod with Ham
           }
 
           val ExitNode = exitNode
-
           val ENTRY = new Node(entryNode)
-
 
           if (level == 1) {
 
@@ -184,12 +159,9 @@ trait AST_Traverse extends TreeTraversal with Collector with NodeMethod with Ham
             SaveNode(ENTRY)
 
             if (level == 2) {
-
               val hammockNode = new Hammock
               CollectionOfMainline(hammockNode)
-
             }
-
 
             c.children.foreach(ast_traverse(_))
 
@@ -197,17 +169,13 @@ trait AST_Traverse extends TreeTraversal with Collector with NodeMethod with Ham
             CollectionOfTempHammockBlock(EXIT)
             SaveNode(EXIT)
 
-
           }
 
           if (level == 1) {
-
             CollectionOfHammockBlock
-
           }
 
           level -= 1
-
 
 /*
       case  c @ ClassDef(mods,name,tparams,impl) if  mods.isSynthetic =>
@@ -294,7 +262,6 @@ trait AST_Traverse extends TreeTraversal with Collector with NodeMethod with Ham
 
           }*/
 
-
             val ENTRY = new Node(entryNode)
             CollectionOfTempHammockBlock(ENTRY)
             SaveNode(ENTRY)
@@ -319,7 +286,6 @@ trait AST_Traverse extends TreeTraversal with Collector with NodeMethod with Ham
             val hammockNode = new Hammock
             CollectionOfMainline(hammockNode)
 
-
             rhs.children.foreach(ast_traverse(_)) //OK
 
             val EXIT = new Node(ExitNode)
@@ -328,63 +294,46 @@ trait AST_Traverse extends TreeTraversal with Collector with NodeMethod with Ham
 
             CollectionOfHammockBlock
 
-
-
           level -= 1
 
-
         case DefDef(mods,name,tparams,vparamss,tpt,rhs) if  mods.isSynthetic=>
-
           rhs.children.foreach(ast_traverse(_))
 
 
         case Block(stats, expr) =>
           stats.foreach(ast_traverse(_))
-
           if (!expr.isEmpty) {
-
             expr.children.foreach(ast_traverse(_))
-
           }
-
 
         case LabelDef(name, _, rhs) =>
           ASNode = name.toString
-
           rhs.children.foreach(ast_traverse(_))
 
         case v @ ValDef(mods, termName, _, rhs) if !mods.toString().contains("syn") =>
-
           ASNode = ""
           rhs.children.foreach(ast_traverse(_))
-
 
           if (!ASNode.contains("new")) {
 
             if (mods.isMutable) {
-
               node = "Mutable." + termName.toString + "." + ASNode
-
             } else {
-
               node = termName.toString + "." + ASNode
-
             }
 
             if (!isHammock) {
-
+              
               val NODE = new Node(node)
-
               CollectionOfMainline(NODE)
               SaveNode(NODE)
-
+              
             } else {
-
+              
               val NODE = new Node(node)
-
               CollectionOfTempHammockBlock(NODE)
               SaveNode(NODE)
-
+              
             }
 
           } else {
@@ -405,20 +354,15 @@ trait AST_Traverse extends TreeTraversal with Collector with NodeMethod with Ham
 
           }
 
-
         case i@If(cond, thenp, elsep) =>
-
           entryNode = "ifEntry"
           exitNode = "ifExit"
-
           val ENTRY = new Node(entryNode)
-
 
           /*
         val condString = "cond." //+ Decompose(cond)
         val COND = new Node(condString)*/
           val EXIT = new Node(exitNode)
-
 
           if (!isHammock) {
 
@@ -509,7 +453,6 @@ trait AST_Traverse extends TreeTraversal with Collector with NodeMethod with Ham
         }
 */
         case t@Throw(expr) =>
-
           entryNode = "throwEntry"
           exitNode = "throwExit"
 
@@ -538,7 +481,6 @@ trait AST_Traverse extends TreeTraversal with Collector with NodeMethod with Ham
 
           }
 
-
         case ExPredefPrint("print", rhs) =>
           val p = "scala.Predef.print"
           //rhs.foreach(ast_traverse(_))
@@ -546,17 +488,12 @@ trait AST_Traverse extends TreeTraversal with Collector with NodeMethod with Ham
           rhs.foreach(ast_traverse(_))
 
           node = p + ASNode
-
           val NODE = new Node(node)
 
           if (!isHammock) {
-
             CollectionOfMainline(NODE)
-
           } else {
-
             CollectionOfTempHammockBlock(NODE)
-
           }
           SaveNode(NODE)
 
@@ -568,53 +505,39 @@ trait AST_Traverse extends TreeTraversal with Collector with NodeMethod with Ham
           rhs.foreach(ast_traverse(_))
 
           node = p + ASNode
-
           val NODE = new Node(node)
 
           if (!isHammock) {
-
             CollectionOfMainline(NODE)
-
           } else {
-
             CollectionOfTempHammockBlock(NODE)
-
           }
           SaveNode(NODE)
 
         case ExPredefPrint("printf", rhs) =>
           val p = "scala.Predef.printf"
           //rhs.foreach(ast_traverse(_))
-
           //ASNode = ""
           rhs.foreach(ast_traverse(_))
 
           node = p + ASNode
-
           val NODE = new Node(node)
 
           if (!isHammock) {
-
             CollectionOfMainline(NODE)
-
           } else {
-
             CollectionOfTempHammockBlock(NODE)
-
           }
           SaveNode(NODE)
 
 
         case f@ExForeach(cond, block) =>
-
           entryNode = "forEntry"
           exitNode = "forExit"
-
           val ENTRY = new Node(entryNode)
           val EXIT = new Node(exitNode)
 
           val condStr = "cond." + cond
-
           val COND = new Node(condStr)
 
           if (!isHammock) {
@@ -645,11 +568,8 @@ trait AST_Traverse extends TreeTraversal with Collector with NodeMethod with Ham
 
 
         case e@ExDoWhile(cond, stats) =>
-
           entryNode = "doWhileEntry"
           exitNode = "doWhileExit"
-
-
           val ENTRY = new Node(entryNode)
 
           //ASNode = ""
@@ -659,7 +579,6 @@ trait AST_Traverse extends TreeTraversal with Collector with NodeMethod with Ham
           val COND = new Node(condStr)
 
           val EXIT = new Node(exitNode)
-
 
           if (!isHammock) {
 
@@ -687,13 +606,9 @@ trait AST_Traverse extends TreeTraversal with Collector with NodeMethod with Ham
 
           }
 
-
         case Match(selector, cases) =>
-
           entryNode = "matchEntry"
           exitNode = "matchExit"
-
-
           val ENTRY = new Node(entryNode)
 
           if (!isHammock) {
@@ -713,7 +628,6 @@ trait AST_Traverse extends TreeTraversal with Collector with NodeMethod with Ham
                   val cENTRY = new Node(caseEntry)
                   CollectionOfMainline(cENTRY)
                   SaveNode(cENTRY)
-
 
                   pat.children.foreach(ast_traverse(_))
                   guard.children.foreach(ast_traverse(_))
@@ -769,12 +683,9 @@ trait AST_Traverse extends TreeTraversal with Collector with NodeMethod with Ham
 
           }
 
-
         case Try(block, catches, finalizer) =>
-
           entryNode = "tryEntry"
           exitNode = "tryExit"
-
           val ENTRY = new Node(entryNode)
 
           if (!isHammock) {
@@ -895,14 +806,11 @@ trait AST_Traverse extends TreeTraversal with Collector with NodeMethod with Ham
 
 
         case Assign(lhs, rhs) =>
-
           lhs.children.foreach(ast_traverse(_))
           rhs.children.foreach(ast_traverse(_))
 
         case Function(vparams, rhs) =>
-
           //vparams.foreach(ast_traverse(_))
-
           rhs.children.foreach(ast_traverse(_))
 
 
@@ -929,23 +837,18 @@ trait AST_Traverse extends TreeTraversal with Collector with NodeMethod with Ham
           ASlevel += 1
 
           if (ASNode != "") {
-
             ASNode = ASNode + "." + "new." + tpt.symbol.pkg + "." + tpt.toString()
-
           } else {
-
             ASNode = "new." + tpt.symbol.pkg + "." + tpt.toString()
-
           }
 
           ASlevel -= 1
 
           if (ASlevel == 0) {
-
             val NODE = new Node(node)
-
+            
             if (!isHammock) {
-
+              
               CollectionOfMainline(NODE)
               SaveNode(NODE)
 
@@ -960,17 +863,12 @@ trait AST_Traverse extends TreeTraversal with Collector with NodeMethod with Ham
 
 
         case Super(qual, mix) =>
-
           ASlevel += 1
 
           if (ASNode != "") {
-
             ASNode = ASNode + "." + "super." + qual.toString() + "." + mix.toString
-
           } else {
-
             ASNode = "super." + qual.toString() + "." + mix.toString
-
           }
 
           ASlevel -= 1
@@ -997,7 +895,6 @@ trait AST_Traverse extends TreeTraversal with Collector with NodeMethod with Ham
 
 
         case a: Apply =>
-
           ASlevel += 1
           a.fun.children.foreach(ast_traverse(_))
           a.args.foreach(ast_traverse(_))
@@ -1026,20 +923,16 @@ trait AST_Traverse extends TreeTraversal with Collector with NodeMethod with Ham
           }
 
         case s: Select =>
-
           ASlevel += 1
 
           s.qualifier.children.foreach(ast_traverse(_))
           if (s.name.toString != "") {
-
             ASNode = ASNode + "." + s.name.toString
-
           }
 
           ASlevel -= 1
 
           if (ASlevel == 0) {
-
 
             val ASNODE = new Node(ASNode)
 
@@ -1067,7 +960,6 @@ trait AST_Traverse extends TreeTraversal with Collector with NodeMethod with Ham
 
         case Bind(name, body) =>
           node = name.toString
-
           val NODE = new Node(node)
 
           if (!isHammock) {
@@ -1095,14 +987,10 @@ trait AST_Traverse extends TreeTraversal with Collector with NodeMethod with Ham
           ASlevel += 1
 
           if (ASNode != "") {
-
             ASNode = ASNode + "." + i.toString()
-
           }
           if (ASNode == "") {
-
             ASNode = i.toString()
-
           }
 
           ASlevel -= 1
@@ -1129,28 +1017,22 @@ trait AST_Traverse extends TreeTraversal with Collector with NodeMethod with Ham
 
 
         case t@This(qual) =>
-
           ASlevel += 1
-
           //println("This " + qual.toString)
 
           if (ASNode != "") {
-
             ASNode = ASNode + "." + qual.toString
-
           }
           if (ASNode == "") {
-
             ASNode = qual.toString
-
           }
 
           ASlevel -= 1
 
           if (ASlevel == 0) {
-
+            
             val ASNODE = new Node(ASNode)
-
+            
             if (!isHammock) {
 
               CollectionOfMainline(ASNODE)
@@ -1169,18 +1051,13 @@ trait AST_Traverse extends TreeTraversal with Collector with NodeMethod with Ham
 
 
         case Literal(str) =>
-
           ASlevel += 1
 
           if (ASNode != "") {
-
             ASNode = ASNode + "." + str.toString()
-
           }
           if (ASNode == "") {
-
             ASNode = str.toString()
-
           }
 
           ASlevel -= 1
@@ -1205,16 +1082,12 @@ trait AST_Traverse extends TreeTraversal with Collector with NodeMethod with Ham
 
           }
 
-
         case EmptyTree =>
 
         case _ =>
 
-
       }
     }
-
-
 
   /*
 
@@ -1370,31 +1243,18 @@ trait AST_Traverse extends TreeTraversal with Collector with NodeMethod with Ham
         t.args.foreach(Decompose(_))
 */
       case i: Ident =>
-
         if(condString != ""){
-
           condString =  condString + "." + i.toString()
-
         }else{
-
           condString = i.toString()
-
         }
-
 
       case t: This =>
-
         if(condString != ""){
-
           condString = condString + "." + t.qual.toString
-
         }else{
-
           condString = t.qual.toString
-
         }
-
-
 
        /*
       case Apply(Select(constantName,newTermName),List(Ident(termName))) =>
@@ -1417,32 +1277,21 @@ trait AST_Traverse extends TreeTraversal with Collector with NodeMethod with Ham
 */
 
   def ResetCondString = {
-
     condString = ""
-
   }
 
-
   def ResearchCallSites(name: String): Array[String] = {
-
     var returnString: Array[String] = Array()
-
     for (cc <- CallerToCallee) {
-
       println("cc  " + cc._1 + cc._2)
-
       if (cc._1.contains(name)) {
-
         returnString = returnString :+ cc._2
-
         println("Callsite " + cc._2)
       }
-
     }
 
     returnString
 
   }
-
 
 }
