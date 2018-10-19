@@ -10,8 +10,6 @@ trait Extractor extends Global{
 
   object StructuralExtractors{
 
-
-
     //识别ValDef的右手边的Tree，
     object ExRhsOfValDef{
 
@@ -32,8 +30,6 @@ trait Extractor extends Global{
 
     }
 
-
-
     object ExPredefPrint{
 
       def unapply(tree:Apply):Option[(String,List[Tree])] = tree match{
@@ -47,7 +43,6 @@ trait Extractor extends Global{
       }
 
     }
-
 
     object ExForeach{
 
@@ -63,7 +58,6 @@ trait Extractor extends Global{
           if foreachName.toString.contains("foreach") =>
           val returnString = termName.toString + ".foreach"
           Some(returnString,block)
-
 
         case Apply(TypeApply(Select(Apply(Select(Select(_,predefName),augmentStringName),List(Ident(name))),foreachName),_),block)
           if foreachName.toString.contains("foreach") =>     // tName and termName is Name of Object , termName is Name of parameter
@@ -86,7 +80,6 @@ trait Extractor extends Global{
         case _ => None
       }
     }
-
 
     object ExEnsuredExpression {
       /** Extracts the 'ensuring' contract from an expression. */
@@ -144,7 +137,6 @@ trait Extractor extends Global{
       }
     }
 
-
     //Extract Constructor from AST
     object ExConstructor {
 
@@ -158,9 +150,6 @@ trait Extractor extends Global{
       }
 
     }
-
-
-
 
     object ExWhile {
       /** Extracts (cond, stmts) from a while loop */
@@ -177,7 +166,6 @@ trait Extractor extends Global{
       }
     }
 
-
     object ExDoWhile {
       /** Extracts (cond, stmts) from a while loop */
       def unapply(tree: Tree): Option[(Tree, List[Tree])] = tree match {
@@ -192,7 +180,6 @@ trait Extractor extends Global{
 
       }
     }
-
 
     object  ExTypeApply{
 
@@ -227,7 +214,6 @@ trait Extractor extends Global{
 
   }
 
-
   object ExpressionExtractors {
 
     object ExAnd {
@@ -243,7 +229,6 @@ trait Extractor extends Global{
 
     }
 
-
     object ExOr {
 
       def unapply(tree:Apply):Option[(Tree,Tree)] = tree match{
@@ -257,7 +242,6 @@ trait Extractor extends Global{
 
     }
 
-
     object ExNot{
 
       def unapply(tree:Select):Option[(Tree)] = tree match{
@@ -270,7 +254,6 @@ trait Extractor extends Global{
       }
 
     }
-
 
     object ExGreater{
 /*
@@ -300,9 +283,7 @@ trait Extractor extends Global{
 
       }
 
-
     }
-
 
     object ExLess{
 
@@ -310,7 +291,6 @@ trait Extractor extends Global{
 
         case Apply(Select(Select(_,lName),termName),List(Literal(num))) if termName.toString == "$less" =>
           Some(lName.toString+ "." +termName.toString + "." + num.toString) //右手边为常数的情况
-
 
         case Apply(Select(Select(_,lName),termName),List(Select(_,rName)))   if termName.toString == "$less" =>
           Some(lName.toString+ "." +termName.toString + "." + rName.toString) // 右手边为变量的情况
@@ -321,14 +301,12 @@ trait Extractor extends Global{
 
     }
 
-
     object ExGreaterEq{
 
       def unapply(tree:Apply):Option[String] = tree match{
 
         case Apply(Select(Select(_,lName),termName),List(Literal(num))) if termName.toString == "$greater$eq" =>
           Some(lName.toString+ "." +termName.toString + "." + num.toString) //右手边为常数的情况
-
 
         case Apply(Select(Select(_,lName),termName),List(Select(_,rName)))   if termName.toString == "$greater$eq" =>
           Some(lName.toString+ "." +termName.toString + "." + rName.toString) // 右手边为变量的情况
@@ -355,10 +333,7 @@ trait Extractor extends Global{
 
       }
 
-
-
     }
-
 
     object ExEQEQorBANGEQ{
       // extract $eq$eq, for example, println(v1 == v2) or println(v1 != v2)
@@ -371,12 +346,9 @@ trait Extractor extends Global{
 
         case _ => None
 
-
       }
 
-
     }
-
 
     //-------------------------------
     //There are code is suitable for Scala Compiler 2.10.0 M3 version. Do Not Use.
@@ -435,7 +407,5 @@ trait Extractor extends Global{
 */
 
   }
-
-
 
 }
