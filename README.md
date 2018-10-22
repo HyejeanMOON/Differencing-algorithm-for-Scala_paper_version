@@ -12,5 +12,5 @@ Gakkai: 情報処理学会　全国大会第80回
 '$ scalac -cp callgraph-plugin.jar -Xplugin:plugin-name.jar [-P:callgraph:<analysis>] <code.scala>'   
   
  You will run plugin twice.First is for original program(project), twice is for modified program(project).
- Then, could you analysis results by another version of differencing_algorithm_for_scala.
+ Then, you can analysis results by another version of differencing_algorithm_for_scala.
   
